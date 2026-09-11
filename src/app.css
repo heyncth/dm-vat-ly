@@ -1,0 +1,76 @@
+/* Fullscreen layout. Sidebar floats right; canvas fills remaining space. */
+
+.app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fullscreen stage: canvas takes all space, sidebar overlays it. */
+.shell-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* Floating sidebar — always visible, overlays canvas right edge. */
+.sidebar {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  width: min(340px, calc(100% - var(--space-3) * 2));
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: calc(100% - var(--space-3) * 2);
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.sidebar > * {
+  pointer-events: auto;
+}
+
+/* Keep legacy dropdown class functional for backwards compat. */
+.dropdown {
+  position: absolute;
+  z-index: 10;
+  max-height: calc(100% - var(--space-3));
+  overflow-y: auto;
+}
+
+.dropdown:focus {
+  outline: none;
+}
+
+.dropdown:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.dropdown--rail {
+  top: var(--space-3);
+  right: var(--space-3);
+  width: min(360px, calc(100% - var(--space-3) * 2));
+}
+
+.dropdown--table {
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  max-width: 720px;
+  margin-left: auto;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    top: var(--space-2);
+    right: var(--space-2);
+    bottom: auto;
+    width: auto;
+    max-height: 50vh;
+  }
+}

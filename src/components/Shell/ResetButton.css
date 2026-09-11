@@ -1,0 +1,20 @@
+.reset-button {
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.reset-button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.reset-button:active {
+  transform: translateY(1px);
+}
