@@ -23,19 +23,32 @@ type ComponentNodeProps = {
 
 function SupplyShape({ w, h, flipped }: { w: number; h: number; flipped?: boolean }) {
   const sx = flipped ? -1 : 1;
-  // When flipped: + visually on right (terminal b), − on left (terminal a)
-  const plusX = flipped ? 12 : -12;
-  const minusX = flipped ? -12 : 12;
+  const plusX = flipped ? 14 : -14;
+  const minusX = flipped ? -14 : 14;
   return (
     <g className="node-shape">
+      <defs>
+        <linearGradient id="plate-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#94a3b8" />
+          <stop offset="100%" stopColor="#475569" />
+        </linearGradient>
+      </defs>
+      {/* leads */}
+      <line x1={-w / 2} y1={0} x2={-14} y2={0} className="node-lead" />
+      <line x1={14} y1={0} x2={w / 2} y2={0} className="node-lead" />
       <g transform={`scale(${sx},1)`}>
-        <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={8} className="node-body" />
-        <line x1={-12} y1={-14} x2={-12} y2={14} className="node-plate node-plate--long" />
-        <line x1={12} y1={-7} x2={12} y2={7} className="node-plate node-plate--short" />
+        {/* long thin plate (+) */}
+        <line x1={-14} y1={-16} x2={-14} y2={16} stroke="url(#plate-grad)" strokeWidth={3} strokeLinecap="round" />
+        {/* short thick plate (−) */}
+        <line x1={-4} y1={-9} x2={-4} y2={9} stroke="url(#plate-grad)" strokeWidth={7} strokeLinecap="round" />
+        {/* second cell */}
+        <line x1={6} y1={-16} x2={6} y2={16} stroke="url(#plate-grad)" strokeWidth={3} strokeLinecap="round" />
+        <line x1={16} y1={-9} x2={16} y2={9} stroke="url(#plate-grad)" strokeWidth={7} strokeLinecap="round" />
       </g>
-      <text x={plusX} y={-h / 2 - 6} textAnchor="middle" className="node-sign">+</text>
-      <text x={minusX} y={-h / 2 - 6} textAnchor="middle" className="node-sign">−</text>
-      <text x={0} y={h / 2 + 16} textAnchor="middle" className="node-caption">Nguồn</text>
+      {/* polarity signs — always readable */}
+      <text x={plusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
+      <text x={minusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
+      <text x={0} y={h / 2 + 14} textAnchor="middle" className="node-caption">Nguồn</text>
     </g>
   );
 }
@@ -43,17 +56,35 @@ function SupplyShape({ w, h, flipped }: { w: number; h: number; flipped?: boolea
 function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h: number; isRunning?: boolean; liveReading?: { U: number; I: number } | null; flipped?: boolean }) {
   const rValue = isRunning && liveReading && liveReading.I > 0 ? liveReading.U / liveReading.I : null;
   const sx = flipped ? -1 : 1;
+  const bodyW = 48;
+  const bodyH = 20;
   return (
     <g className="node-shape">
+      <defs>
+        <linearGradient id="resist-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e2e8f0" />
+          <stop offset="50%" stopColor="#cbd5e1" />
+          <stop offset="100%" stopColor="#94a3b8" />
+        </linearGradient>
+      </defs>
       <g transform={`scale(${sx},1)`}>
-        <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={6} className="node-body" />
-        <polyline points="-24,0 -16,-10 -8,10 0,-10 8,10 16,-10 24,0" className="node-zigzag" />
+        {/* leads */}
+        <line x1={-w / 2} y1={0} x2={-bodyW / 2} y2={0} className="node-lead" />
+        <line x1={bodyW / 2} y1={0} x2={w / 2} y2={0} className="node-lead" />
+        {/* IEC rectangle body */}
+        <rect x={-bodyW / 2} y={-bodyH / 2} width={bodyW} height={bodyH} rx={3}
+          fill="url(#resist-grad)" stroke="#475569" strokeWidth={2} />
+        {/* color bands */}
+        <rect x={-bodyW / 2 + 8} y={-bodyH / 2} width={4} height={bodyH} fill="#a16207" rx={1} />
+        <rect x={-bodyW / 2 + 16} y={-bodyH / 2} width={4} height={bodyH} fill="#a16207" rx={1} />
+        <rect x={-bodyW / 2 + 24} y={-bodyH / 2} width={4} height={bodyH} fill="#b45309" rx={1} />
+        <rect x={bodyW / 2 - 10} y={-bodyH / 2} width={4} height={bodyH} fill="#d4af37" rx={1} />
       </g>
-      <text x={0} y={h / 2 + 16} textAnchor="middle" className="node-caption">R</text>
+      <text x={0} y={h / 2 + 12} textAnchor="middle" className="node-caption">R</text>
       {rValue !== null && (
         <g className="r-badge">
-          <rect x={-36} y={-h / 2 - 28} width={72} height={22} rx={4} fill="#fef08a" stroke="#eab308" strokeWidth={1.5} />
-          <text x={0} y={-h / 2 - 13} textAnchor="middle" style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'monospace', fill: '#854d0e' }}>
+          <rect x={-38} y={-bodyH / 2 - 26} width={76} height={20} rx={4} fill="#fef08a" stroke="#eab308" strokeWidth={1.5} />
+          <text x={0} y={-bodyH / 2 - 12} textAnchor="middle" style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'monospace', fill: '#854d0e' }}>
             R = {rValue.toFixed(2)} Ω
           </text>
         </g>
@@ -75,14 +106,25 @@ function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue }: {
   const displayValue = isRunning && liveReading
     ? (comp.type === 'ammeter' ? liveReading.I : liveReading.U)
     : rawValue;
+  const accentColor = comp.type === 'ammeter' ? '#0ea5e9' : '#8b5cf6';
 
   return (
     <g className="node-shape">
-      <circle r={r} className="node-body" />
-      <rect x={-r + 4} y={-12} width={(r - 4) * 2} height={24} rx={3}
-        fill={isRunning ? '#dcfce7' : '#f1f5f9'} stroke="var(--color-border)" strokeWidth={1} />
+      <defs>
+        <linearGradient id={`gauge-grad-${comp.type}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#e2e8f0" />
+        </linearGradient>
+      </defs>
+      {/* outer ring */}
+      <circle r={r + 3} fill="none" stroke={accentColor} strokeWidth={2.5} opacity={0.4} />
+      {/* body */}
+      <circle r={r} fill={`url(#gauge-grad-${comp.type})`} stroke="#475569" strokeWidth={2} />
+      {/* LCD display */}
+      <rect x={-r + 6} y={-10} width={(r - 6) * 2} height={20} rx={3}
+        fill={isRunning ? '#dcfce7' : '#f1f5f9'} stroke="#94a3b8" strokeWidth={1} />
       <text x={0} y={4} textAnchor="middle" style={{
-        fontSize: '11px', fontWeight: 600, fontFamily: 'monospace',
+        fontSize: '12px', fontWeight: 700, fontFamily: 'monospace',
         fill: isRunning ? '#166534' : '#475569', userSelect: 'none',
       }}>
         {displayValue.toFixed(2)} {unit}
@@ -96,24 +138,31 @@ function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue }: {
 
 function SwitchShape({ w, h, closed, flipped }: { w: number; h: number; closed: boolean; flipped?: boolean }) {
   const sx = flipped ? -1 : 1;
+  const leverEndX = closed ? w / 2 - 14 : w / 2 - 18;
+  const leverEndY = closed ? 0 : -22;
   return (
     <g className="node-shape">
       <g transform={`scale(${sx},1)`}>
+        {/* base plate */}
+        <rect x={-w / 2 + 8} y={-6} width={w - 16} height={12} rx={3}
+          fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1.5} />
+        {/* leads */}
         <line x1={-w / 2} y1={0} x2={-w / 2 + 14} y2={0} className="node-lead" />
         <line x1={w / 2 - 14} y1={0} x2={w / 2} y2={0} className="node-lead" />
-        {closed ? (
-          <line x1={-w / 2 + 14} y1={0} x2={w / 2 - 14} y2={0} className="node-lever" />
-        ) : (
-          <line x1={-w / 2 + 14} y1={0} x2={w / 2 - 18} y2={-20} className="node-lever" />
-        )}
-        <circle cx={-w / 2 + 14} cy={0} r={4} className="node-pivot" />
-        <circle cx={closed ? w / 2 - 14 : w / 2 - 18} cy={closed ? 0 : -20} r={4}
-          className={`node-pivot${closed ? '' : ' node-pivot--open'}`} />
-        {/* Invisible hit area — large for easy clicking */}
-        <line x1={-w / 2 + 14} y1={closed ? 0 : 10} x2={closed ? w / 2 - 14 : w / 2 - 18} y2={closed ? 0 : -10}
+        {/* lever */}
+        <line x1={-w / 2 + 14} y1={0} x2={leverEndX} y2={leverEndY}
+          stroke="#1e293b" strokeWidth={3} strokeLinecap="round"
+          style={{ transition: 'x2 0.2s, y2 0.2s' }} />
+        {/* pivot (fixed) */}
+        <circle cx={-w / 2 + 14} cy={0} r={5} fill="#475569" stroke="#1e293b" strokeWidth={1.5} />
+        {/* contact (moving end) */}
+        <circle cx={leverEndX} cy={leverEndY} r={5}
+          fill={closed ? '#22c55e' : '#f8fafc'} stroke="#1e293b" strokeWidth={1.5} />
+        {/* invisible hit area */}
+        <line x1={-w / 2 + 14} y1={closed ? 0 : 12} x2={leverEndX} y2={closed ? 0 : -12}
           stroke="transparent" strokeWidth={36} strokeLinecap="round" className="switch-hit" />
       </g>
-      <text x={0} y={h / 2 + 16} textAnchor="middle" className="node-caption">Công tắc</text>
+      <text x={0} y={h / 2 + 10} textAnchor="middle" className="node-caption">Công tắc</text>
     </g>
   );
 }
@@ -158,18 +207,25 @@ export default function ComponentNode({
         const isPending = pendingTerminals.some((t) => t.compId === comp.id && t.end === end);
         const label = `${def.label}, chốt ${end === 'a' ? 'trái' : 'phải'}`;
         return (
-          <circle key={end} cx={pos.x} cy={pos.y} r={wireMode ? 9 : 5} tabIndex={0}
-            role="button" aria-label={label}
-            className={`terminal${wireMode ? ' terminal--active' : ''}${isPending ? ' terminal--pending' : ''}`}
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => { event.stopPropagation(); onTerminalActivate({ compId: comp.id, end }); }}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault(); event.stopPropagation();
-                onTerminalActivate({ compId: comp.id, end });
-              }
-            }}
-          />
+          <g key={end}>
+            {/* glow ring on hover */}
+            {wireMode && (
+              <circle cx={pos.x} cy={pos.y} r={12} fill="none" stroke="var(--color-primary)"
+                strokeWidth={1.5} opacity={0.3} className="terminal-glow" />
+            )}
+            <circle cx={pos.x} cy={pos.y} r={wireMode ? 8 : 5} tabIndex={0}
+              role="button" aria-label={label}
+              className={`terminal${wireMode ? ' terminal--active' : ''}${isPending ? ' terminal--pending' : ''}`}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => { event.stopPropagation(); onTerminalActivate({ compId: comp.id, end }); }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault(); event.stopPropagation();
+                  onTerminalActivate({ compId: comp.id, end });
+                }
+              }}
+            />
+          </g>
         );
       })}
     </g>

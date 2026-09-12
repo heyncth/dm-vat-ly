@@ -249,6 +249,23 @@
   font-weight: 700;
 }
 
+.node-sign--plus {
+  fill: #dc2626;
+}
+
+.node-sign--minus {
+  fill: #1e293b;
+}
+
+.terminal-glow {
+  animation: terminal-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes terminal-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
 .node-caption {
   font-size: 13px;
   fill: var(--color-text-muted);
