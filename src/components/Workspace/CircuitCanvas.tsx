@@ -38,7 +38,7 @@ function InlineToolbar({ comp, circuit }: {
       <rect width={barW} height={barH} rx={6} fill="var(--color-panel)" stroke="var(--color-border)" strokeWidth={1} />
       {/* Flip button */}
       <g transform={`translate(4 3)`} className="inline-toolbar-btn" onClick={() => circuit.flipComponent(comp.id)}>
-        <rect width={btnSize} height={btnSize} rx={4} fill="var(--color-bg)" stroke="var(--color-border)" strokeWidth={1} />
+        <rect width={btnSize} height={btnSize} rx={4} fill="var(--color-page)" stroke="var(--color-border)" strokeWidth={1} />
         <text x={btnSize / 2} y={btnSize / 2 + 1} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={700} fill="var(--color-text)" style={{ pointerEvents: 'none' }}>⇄</text>
       </g>
       {/* Delete button */}

@@ -47,7 +47,7 @@ describe('Phase 4 measurement engine', () => {
     openControls();
 
     expect(within(rail()).getByRole('button', { name: /chạy mô phỏng/i })).toBeDisabled();
-    expect(within(rail()).getByText(/mạch chưa đầy đủ/i)).toBeInTheDocument();
+    expect(within(rail()).getByText(/thêm nguồn điện/i)).toBeInTheDocument();
   });
 
   it('enables play when sample circuit is complete', () => {
@@ -69,9 +69,9 @@ describe('Phase 4 measurement engine', () => {
 
     stopSimulation();
 
-    // Auto-recorded: trial 1 dot should show checkmark
+    // No auto-record: trial dot still shows number
     const trialDots = within(rail()).getAllByRole('button').filter(d => d.className.includes('trial-dot'));
-    expect(trialDots[0]).toHaveTextContent('✓');
+    expect(trialDots[0]).toHaveTextContent('1');
   });
 
   it('resets switch visual when simulation stops', () => {

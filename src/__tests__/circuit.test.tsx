@@ -34,9 +34,11 @@ describe('Phase 2 circuit editing', () => {
     // Select the component
     fireEvent.click(node);
 
-    // Click the toolbar X delete button (has title="Xóa")
-    const deleteBtn = screen.getByTitle('Xóa');
-    fireEvent.click(deleteBtn);
+    // Click the inline SVG delete button (× text in toolbar)
+    const svgStage = stage();
+    const deleteBtn = svgStage.querySelector('.inline-toolbar-btn--delete');
+    expect(deleteBtn).toBeTruthy();
+    fireEvent.click(deleteBtn!);
 
     expect(within(stage()).queryByRole('button', { name: /linh kiện điện trở/i })).not.toBeInTheDocument();
   });

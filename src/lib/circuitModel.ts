@@ -255,5 +255,15 @@ export function validateCircuit(
     reasons.push('Vôn kế chưa mắc song song với điện trở.');
   }
 
+  // Polarity check: if ammeter or voltmeter is flipped, polarity is wrong.
+  const ammeter = one('ammeter');
+  const voltmeter2 = one('voltmeter');
+  if (ammeter.flipped) {
+    reasons.push('Cực Ampe kế bị đảo — kiểm tra chiều nối +/-.');
+  }
+  if (voltmeter2.flipped) {
+    reasons.push('Cực Vôn kế bị đảo — kiểm tra chiều nối +/-.');
+  }
+
   return { valid: reasons.length === 0, reasons };
 }

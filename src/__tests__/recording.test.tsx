@@ -28,8 +28,8 @@ function selectTrial(n: number) {
   if (dot) fireEvent.click(dot);
 }
 
-describe('Phase 6 auto-recording', () => {
-  it('auto-records when simulation stops with a trial selected', () => {
+describe('trial selection (no auto-record)', () => {
+  it('trial dots always show numbers, no checkmark', () => {
     render(<App />);
     openControls();
     sampleCircuit();
@@ -37,44 +37,23 @@ describe('Phase 6 auto-recording', () => {
     runSimulation();
     stopSimulation();
 
-    // Trial 1 dot should now show checkmark (recorded)
     const trialDots = within(rail()).getAllByRole('button').filter(d => d.className.includes('trial-dot'));
-    expect(trialDots[0]).toHaveTextContent('✓');
+    expect(trialDots[0]).toHaveTextContent('1');
   });
 
-  it('prevents recording the same trial twice', () => {
+  it('can select and deselect trials', () => {
     render(<App />);
     openControls();
     sampleCircuit();
+
     selectTrial(1);
-    runSimulation();
-    stopSimulation();
-    // Trial 1 recorded
-    const trialDots = within(rail()).getAllByRole('button').filter(d => d.className.includes('trial-dot'));
-    expect(trialDots[0]).toHaveTextContent('✓');
-    // Select trial 2 and record
-    selectTrial(2);
-    runSimulation();
-    stopSimulation();
-    expect(trialDots[1]).toHaveTextContent('✓');
+    expect(within(rail()).getByRole('button', { name: '1' })).toHaveAttribute('aria-pressed', 'true');
+
+    selectTrial(1);
+    expect(within(rail()).getByRole('button', { name: '1' })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('shows trial count progressing', () => {
-    render(<App />);
-    openControls();
-    sampleCircuit();
-    selectTrial(1);
-    runSimulation();
-    stopSimulation();
-    expect(within(rail()).getByText('1 / 5')).toBeInTheDocument();
-
-    selectTrial(2);
-    runSimulation();
-    stopSimulation();
-    expect(within(rail()).getByText('2 / 5')).toBeInTheDocument();
-  });
-
-  it('clears on reset', () => {
+  it('resets on reset', () => {
     render(<App />);
     openControls();
     sampleCircuit();
@@ -84,6 +63,6 @@ describe('Phase 6 auto-recording', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /đặt lại/i }));
     openControls();
-    expect(within(rail()).getByText('0 / 5')).toBeInTheDocument();
+    expect(within(rail()).getByRole('button', { name: '1' })).toHaveAttribute('aria-pressed', 'false');
   });
 });
