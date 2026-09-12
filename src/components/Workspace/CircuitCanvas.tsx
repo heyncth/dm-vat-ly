@@ -21,14 +21,42 @@ const MAX_ZOOM = 3;
 
 type Ghost = { type: ComponentType; clientX: number; clientY: number };
 
-function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentEdit, screenPos }: {
+function InlineToolbar({ comp, circuit }: {
+  comp: PlacedComponent;
+  circuit: CircuitApi;
+}) {
+  const def = COMPONENT_DEFS[comp.type];
+  const btnSize = 26;
+  const gap = 4;
+  const barW = btnSize * 2 + gap + 8;
+  const barH = btnSize + 6;
+  const x = comp.x - barW / 2;
+  const y = comp.y - def.h / 2 - barH - 8;
+
+  return (
+    <g className="inline-toolbar" transform={`translate(${x} ${y})`}>
+      <rect width={barW} height={barH} rx={6} fill="var(--color-panel)" stroke="var(--color-border)" strokeWidth={1} />
+      {/* Flip button */}
+      <g transform={`translate(4 3)`} className="inline-toolbar-btn" onClick={() => circuit.flipComponent(comp.id)}>
+        <rect width={btnSize} height={btnSize} rx={4} fill="var(--color-bg)" stroke="var(--color-border)" strokeWidth={1} />
+        <text x={btnSize / 2} y={btnSize / 2 + 1} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={700} fill="var(--color-text)" style={{ pointerEvents: 'none' }}>⇄</text>
+      </g>
+      {/* Delete button */}
+      <g transform={`translate(${4 + btnSize + gap} 3)`} className="inline-toolbar-btn inline-toolbar-btn--delete" onClick={() => { circuit.setSelected({ kind: 'comp', id: comp.id }); circuit.removeSelected(); }}>
+        <rect width={btnSize} height={btnSize} rx={4} fill="#ef4444" stroke="#dc2626" strokeWidth={1} />
+        <text x={btnSize / 2} y={btnSize / 2 + 1} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={700} fill="white" style={{ pointerEvents: 'none' }}>×</text>
+      </g>
+    </g>
+  );
+}
+
+function BottomBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentEdit }: {
   comp: PlacedComponent;
   circuit: CircuitApi;
   liveReading?: { U: number; I: number } | null;
   manualU?: number;
   manualI?: number;
   onInstrumentEdit?: (type: 'U' | 'I', value: number) => void;
-  screenPos: { x: number; y: number; halfW: number; halfH: number } | null;
 }) {
   const def = COMPONENT_DEFS[comp.type];
   const isInstrument = comp.type === 'voltmeter' || comp.type === 'ammeter';
@@ -44,51 +72,33 @@ function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrume
     }
   };
 
-  const toolbarStyle = screenPos ? { left: screenPos.x + screenPos.halfW + 12, top: screenPos.y - 18 } : {};
-
   return (
-    <>
-      {/* Toolbar — actions, positioned next to selected component */}
-      <div className="toolbar-wrap" style={toolbarStyle}>
-        <div className="toolbar">
-          <button type="button" className="toolbar-btn" title="Lật ngược" onClick={() => circuit.flipComponent(comp.id)}>
-            ⇄
-          </button>
-          {isInstrument && !circuit.isRunning && (
-            <span className="toolbar-value" onClick={() => { setDraft(String(value ?? 0)); setEditing(true); }}>
-              {(value ?? 0).toFixed(2)} {unit} ✎
-            </span>
-          )}
-          {isInstrument && circuit.isRunning && (
-            <span className="toolbar-value toolbar-value--live">
-              {(comp.type === 'voltmeter' ? liveReading?.U : liveReading?.I)?.toFixed(2) ?? '0.00'} {unit}
-            </span>
-          )}
-          <button type="button" className="toolbar-btn toolbar-btn--delete" title="Xóa" onClick={() => {
-            circuit.setSelected({ kind: 'comp', id: comp.id });
-            circuit.removeSelected();
-          }}>×</button>
-        </div>
-        {editing && isInstrument && (
-          <div className="toolbar-edit">
-            <input type="number" min={0} step="any" value={draft} autoFocus
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={commitEdit}
-              onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditing(false); }}
-            />
-            <span className="toolbar-edit-unit">{unit}</span>
-            <button type="button" className="toolbar-edit-ok" onClick={commitEdit}>✓</button>
-          </div>
+    <div className="bottom-bar-wrap">
+      <div className="bottom-bar">
+        <span className="bottom-bar-label">Đã chọn: {def.label}</span>
+        {isInstrument && !circuit.isRunning && (
+          <span className="bottom-bar-value" onClick={() => { setDraft(String(value ?? 0)); setEditing(true); }}>
+            {(value ?? 0).toFixed(2)} {unit} ✎
+          </span>
+        )}
+        {isInstrument && circuit.isRunning && (
+          <span className="bottom-bar-value bottom-bar-value--live">
+            {(comp.type === 'voltmeter' ? liveReading?.U : liveReading?.I)?.toFixed(2) ?? '0.00'} {unit}
+          </span>
         )}
       </div>
-
-      {/* Bottom bar — info only */}
-      <div className="info-bar-wrap">
-        <div className="info-bar">
-          Đã chọn: {def.label}
+      {editing && isInstrument && (
+        <div className="bottom-bar-edit">
+          <input type="number" min={0} step="any" value={draft} autoFocus
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={commitEdit}
+            onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditing(false); }}
+          />
+          <span className="bottom-bar-edit-unit">{unit}</span>
+          <button type="button" className="bottom-bar-edit-ok" onClick={commitEdit}>✓</button>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
 
@@ -103,6 +113,7 @@ type CircuitCanvasProps = {
 export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, onInstrumentEdit }: CircuitCanvasProps) {
   const { components, wires, selected, activeTool, pending } = circuit;
   const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
   const nodeDrag = useRef<{ id: string; dx: number; dy: number } | null>(null);
   const placeDrag = useRef<{
     type: ComponentType;
@@ -343,7 +354,7 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
         onPlaceStart={handlePlaceStart}
         onPlaceAtFree={handlePlaceAtFree}
       />
-      <div className="stage-svg-wrap">
+      <div className="stage-svg-wrap" ref={wrapRef}>
         {/* Zoom controls */}
         <div className="zoom-controls">
           <button type="button" className="zoom-btn" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.2))} title="Phóng to">+</button>
@@ -399,6 +410,11 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
                 Thêm dụng cụ từ hộp bên trái
               </text>
             )}
+            {selected?.kind === 'comp' && (() => {
+              const comp = components.find((c) => c.id === selected.id);
+              if (!comp) return null;
+              return <InlineToolbar comp={comp} circuit={circuit} />;
+            })()}
           </g>
 
           {/* Fixed title — does not pan/zoom */}
@@ -418,28 +434,14 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
         {selected?.kind === 'comp' && (() => {
           const comp = components.find((c) => c.id === selected.id);
           if (!comp) return null;
-          const svg = svgRef.current;
-          if (!svg) return null;
-          const rect = svg.getBoundingClientRect();
-          const def = COMPONENT_DEFS[comp.type];
-          const pixelPerUnit = rect.width / STAGE_W;
-          const svgX = (comp.x * zoom + pan.x) * pixelPerUnit + rect.left;
-          const svgY = (comp.y * zoom + pan.y) * pixelPerUnit + rect.top;
-          const screenPos = {
-            x: svgX,
-            y: svgY,
-            halfW: (def.w / 2) * zoom * pixelPerUnit,
-            halfH: (def.h / 2) * zoom * pixelPerUnit,
-          };
           return (
-            <SelectionBar
+            <BottomBar
               comp={comp}
               circuit={circuit}
               liveReading={liveReading}
               manualU={manualU}
               manualI={manualI}
               onInstrumentEdit={onInstrumentEdit}
-              screenPos={screenPos}
             />
           );
         })()}
