@@ -57,7 +57,7 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
         <line x1={bodyW / 2} y1={0} x2={w / 2} y2={0} className="node-lead" />
         {/* IEC rectangle body */}
         <rect x={-bodyW / 2} y={-bodyH / 2} width={bodyW} height={bodyH} rx={3}
-          fill="url(#resist-grad)" stroke="#475569" strokeWidth={2} />
+          fill="#e2e8f0" stroke="#475569" strokeWidth={2} />
         {/* color bands */}
         <rect x={-bodyW / 2 + 8} y={-bodyH / 2} width={4} height={bodyH} fill="#a16207" rx={1} />
         <rect x={-bodyW / 2 + 16} y={-bodyH / 2} width={4} height={bodyH} fill="#a16207" rx={1} />

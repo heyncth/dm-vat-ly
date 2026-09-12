@@ -53,6 +53,10 @@
 body {
   margin: 0;
   background: var(--color-page);
+  background-image: url('/image.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-stack);
   font-size: var(--text-body);

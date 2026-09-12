@@ -17,10 +17,11 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: var(--space-2);
-  background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.72);
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-raise);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   overflow-y: auto;
 }
 
@@ -49,8 +50,9 @@
   font-size: var(--text-helper);
   font-weight: 500;
   color: var(--color-text);
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.6);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: var(--radius-sm);
   cursor: grab;
   touch-action: none;
@@ -85,9 +87,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-    center 20px,
-    8px 0;
-}
 
 /* ---- SVG stage ---- */
 .stage-svg-wrap {
@@ -101,8 +100,8 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--color-workspace);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-lg);
   touch-action: none;
   cursor: grab;
@@ -128,10 +127,11 @@
   align-items: center;
   gap: var(--space-1);
   padding: 3px;
-  background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.75);
+
+  border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-raise);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .zoom-btn {
@@ -166,7 +166,7 @@
 }
 
 .stage-bg {
-  fill: var(--color-workspace);
+  fill: rgba(255, 255, 255, 0.35);
 }
 
 .grid-line {
@@ -178,6 +178,20 @@
 .stage-hint {
   fill: var(--color-text-muted);
   font-size: 22px;
+  paint-order: stroke fill;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.stage-watermark {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  fill: #1e293b;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ---- nodes ---- */
@@ -224,6 +238,10 @@
 .node-sign {
   font-size: 14px;
   font-weight: 700;
+  paint-order: stroke fill;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 
 .node-sign--plus {
@@ -247,6 +265,10 @@
   font-size: 13px;
   fill: var(--color-text-muted);
   font-weight: 500;
+  paint-order: stroke fill;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 
 /* R value badge on resistor during simulation */
@@ -385,10 +407,11 @@
   padding: var(--space-1) var(--space-2);
   font-size: var(--text-helper);
   font-weight: 600;
-  background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.78);
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 999px;
-  box-shadow: var(--shadow-raise);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .toolbar-btn {
@@ -452,10 +475,11 @@
   gap: var(--space-1);
   padding: var(--space-1) var(--space-2);
   margin-top: var(--space-1);
-  background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.78);
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-raise);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .toolbar-edit input {
@@ -512,10 +536,11 @@
   font-size: var(--text-helper);
   font-weight: 600;
   color: var(--color-text-muted);
-  background: var(--color-panel);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.72);
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 999px;
-  box-shadow: var(--shadow-raise);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
 }
 

@@ -183,9 +183,7 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
   const handleSvgPointerDown = useCallback((e: React.PointerEvent) => {
     // Pan on middle button or when clicking empty background
     const isMiddle = e.button === 1;
-    const isBackground = e.target === svgRef.current
-      || (e.target as Element).classList.contains('stage-bg')
-      || (e.target as Element).getAttribute('fill') === 'url(#lab-grid)';
+    const isBackground = e.target === svgRef.current;
 
     if (isBackground) {
       // Always deselect + cancel wire on background click
@@ -357,15 +355,11 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
           aria-label="Mạch điện đang lắp."
           onPointerDown={handleSvgPointerDown}
         >
-          <defs>
-            <pattern id="lab-grid" width={GRID} height={GRID} patternUnits="userSpaceOnUse">
-              <circle cx={GRID / 2} cy={GRID / 2} r={1.2} fill="var(--color-border)" opacity="0.45" />
-            </pattern>
-          </defs>
-          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} className="stage-bg" onClick={handleBackgroundClick} />
-          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} fill="url(#lab-grid)" onClick={handleBackgroundClick} />
-
-          {/* Zoomable/pannable content group */}
+          {/* Centered watermark — top of canvas */}
+          <text x={STAGE_W / 2} y={28} textAnchor="middle"
+            className="stage-watermark" aria-hidden="true">
+            Khu vực mô phỏng
+          </text>
           <g transform={transform} className="stage-content">
             <WireLayer
               wires={wires}
