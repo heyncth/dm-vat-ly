@@ -23,24 +23,20 @@ type ComponentNodeProps = {
 
 function SupplyShape({ w, h, flipped }: { w: number; h: number; flipped?: boolean }) {
   const sx = flipped ? -1 : 1;
-  const plusX = flipped ? 14 : -14;
-  const minusX = flipped ? -14 : 14;
+  const plusX = flipped ? 8 : -8;
+  const minusX = flipped ? -8 : 8;
   return (
     <g className="node-shape">
       {/* leads */}
-      <line x1={-w / 2} y1={0} x2={-16} y2={0} className="node-lead" />
-      <line x1={16} y1={0} x2={w / 2} y2={0} className="node-lead" />
+      <line x1={-w / 2} y1={0} x2={-6} y2={0} className="node-lead" />
+      <line x1={6} y1={0} x2={w / 2} y2={0} className="node-lead" />
       <g transform={`scale(${sx},1)`}>
-        {/* cell 1: long thin (+) */}
-        <line x1={-14} y1={-16} x2={-14} y2={16} stroke="#475569" strokeWidth={3} strokeLinecap="round" />
-        {/* cell 1: short thick (−) */}
-        <line x1={-6} y1={-9} x2={-6} y2={9} stroke="#475569" strokeWidth={7} strokeLinecap="round" />
-        {/* cell 2: long thin (+) */}
-        <line x1={4} y1={-16} x2={4} y2={16} stroke="#475569" strokeWidth={3} strokeLinecap="round" />
-        {/* cell 2: short thick (−) */}
-        <line x1={12} y1={-9} x2={12} y2={9} stroke="#475569" strokeWidth={7} strokeLinecap="round" />
+        {/* long thin plate (+) */}
+        <line x1={-6} y1={-18} x2={-6} y2={18} stroke="#475569" strokeWidth={3} strokeLinecap="round" />
+        {/* short thick plate (−) */}
+        <line x1={6} y1={-10} x2={6} y2={10} stroke="#475569" strokeWidth={7} strokeLinecap="round" />
       </g>
-      {/* polarity signs — always readable, outside scaled group */}
+      {/* polarity signs */}
       <text x={plusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
       <text x={minusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
       <text x={0} y={h / 2 + 14} textAnchor="middle" className="node-caption">Nguồn</text>
