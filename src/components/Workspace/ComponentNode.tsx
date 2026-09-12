@@ -138,31 +138,24 @@ function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue }: {
 
 function SwitchShape({ w, h, closed, flipped }: { w: number; h: number; closed: boolean; flipped?: boolean }) {
   const sx = flipped ? -1 : 1;
-  const leverEndX = closed ? w / 2 - 14 : w / 2 - 18;
-  const leverEndY = closed ? 0 : -22;
   return (
     <g className="node-shape">
       <g transform={`scale(${sx},1)`}>
-        {/* base plate */}
-        <rect x={-w / 2 + 8} y={-6} width={w - 16} height={12} rx={3}
-          fill="#e2e8f0" stroke="#94a3b8" strokeWidth={1.5} />
-        {/* leads */}
         <line x1={-w / 2} y1={0} x2={-w / 2 + 14} y2={0} className="node-lead" />
         <line x1={w / 2 - 14} y1={0} x2={w / 2} y2={0} className="node-lead" />
-        {/* lever */}
-        <line x1={-w / 2 + 14} y1={0} x2={leverEndX} y2={leverEndY}
-          stroke="#1e293b" strokeWidth={3} strokeLinecap="round"
-          style={{ transition: 'x2 0.2s, y2 0.2s' }} />
-        {/* pivot (fixed) */}
-        <circle cx={-w / 2 + 14} cy={0} r={5} fill="#475569" stroke="#1e293b" strokeWidth={1.5} />
-        {/* contact (moving end) */}
-        <circle cx={leverEndX} cy={leverEndY} r={5}
-          fill={closed ? '#22c55e' : '#f8fafc'} stroke="#1e293b" strokeWidth={1.5} />
+        {closed ? (
+          <line x1={-w / 2 + 14} y1={0} x2={w / 2 - 14} y2={0} className="node-lever" />
+        ) : (
+          <line x1={-w / 2 + 14} y1={0} x2={w / 2 - 18} y2={-20} className="node-lever" />
+        )}
+        <circle cx={-w / 2 + 14} cy={0} r={4} className="node-pivot" />
+        <circle cx={closed ? w / 2 - 14 : w / 2 - 18} cy={closed ? 0 : -20} r={4}
+          className={`node-pivot${closed ? '' : ' node-pivot--open'}`} />
         {/* invisible hit area */}
-        <line x1={-w / 2 + 14} y1={closed ? 0 : 12} x2={leverEndX} y2={closed ? 0 : -12}
+        <line x1={-w / 2 + 14} y1={closed ? 0 : 10} x2={closed ? w / 2 - 14 : w / 2 - 18} y2={closed ? 0 : -10}
           stroke="transparent" strokeWidth={36} strokeLinecap="round" className="switch-hit" />
       </g>
-      <text x={0} y={h / 2 + 10} textAnchor="middle" className="node-caption">Công tắc</text>
+      <text x={0} y={h / 2 + 16} textAnchor="middle" className="node-caption">Công tắc</text>
     </g>
   );
 }

@@ -429,7 +429,13 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
           style={{ left: ghost.clientX + 12, top: ghost.clientY + 12 }}
           aria-hidden="true"
         >
-          {COMPONENT_DEFS[ghost.type].label}
+          <svg viewBox="0 0 48 32" width={40} height={28}>
+            <line x1={4} y1={16} x2={44} y2={16} stroke="#475569" strokeWidth={2} strokeLinecap="round" />
+            <text x={24} y={20} textAnchor="middle" fontSize={12} fontWeight={700} fill="#475569">
+              {ghost.type === 'supply' ? '⚡' : ghost.type === 'resistor' ? 'R' : ghost.type === 'ammeter' ? 'A' : ghost.type === 'voltmeter' ? 'V' : '⏻'}
+            </text>
+          </svg>
+          <span className="drag-ghost-label">{COMPONENT_DEFS[ghost.type].label}</span>
         </div>
       )}
     </div>

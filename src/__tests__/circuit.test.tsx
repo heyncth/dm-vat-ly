@@ -7,7 +7,8 @@ function stage() {
 }
 
 function addComponent(label: string) {
-  fireEvent.click(screen.getByRole('button', { name: label }));
+  const palette = screen.getByRole('toolbar', { name: /hộp dụng cụ/i });
+  fireEvent.click(within(palette).getByRole('button', { name: new RegExp(label) }));
 }
 
 function stageNode(label: RegExp) {
@@ -19,7 +20,7 @@ describe('Phase 2 circuit editing', () => {
     render(<App />);
 
     for (const name of ['Nguồn điện', 'Điện trở', 'Ampe kế', 'Vôn kế', 'Công tắc']) {
-      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: new RegExp(name) })).toBeInTheDocument();
     }
   });
 
