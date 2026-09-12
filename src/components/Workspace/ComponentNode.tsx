@@ -170,6 +170,9 @@ export default function ComponentNode({
       onKeyDown={(event) => onNodeKeyDown(event, comp.id)}
     >
       <title>{def.label}</title>
+      {/* Invisible hit area for the whole component */}
+      <rect x={-def.w / 2 - haloPad} y={-def.h / 2 - haloPad}
+        width={def.w + haloPad * 2} height={def.h + haloPad * 2} fill="transparent" />
       {selected && (
         <rect x={-def.w / 2 - haloPad} y={-def.h / 2 - haloPad}
           width={def.w + haloPad * 2} height={def.h + haloPad * 2} rx={12} className="node-halo" />
