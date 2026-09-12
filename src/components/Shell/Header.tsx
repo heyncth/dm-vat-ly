@@ -11,7 +11,7 @@ type HeaderProps = {
 export default function Header({ openPanel, onTogglePanel, onReset }: HeaderProps) {
   return (
     <header className="shell-header">
-      <h1 className="shell-title">THÍ NGHIỆM ĐỊNH LUẬT OHM</h1>
+      <h1 className="shell-title">THÍ NGHIỆM ĐỊNH LUẬT OHM - Nhóm 5 lớp 10/2</h1>
       <nav className="shell-toolbar" aria-label="Bảng điều khiển">
         <button
           type="button"

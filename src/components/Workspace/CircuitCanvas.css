@@ -341,14 +341,14 @@
 }
 
 .wire--active {
-  stroke: #3b82f6;
+  stroke: #eab308;
   stroke-width: 4;
-  filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.4));
+  filter: drop-shadow(0 0 3px rgba(234, 179, 8, 0.5));
 }
 
 /* ---- current particles ---- */
 .particle {
-  fill: #38bdf8;
+  fill: #facc15;
   opacity: 0.9;
 }
 

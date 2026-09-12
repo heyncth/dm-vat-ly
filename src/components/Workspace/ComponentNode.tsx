@@ -27,25 +27,20 @@ function SupplyShape({ w, h, flipped }: { w: number; h: number; flipped?: boolea
   const minusX = flipped ? -14 : 14;
   return (
     <g className="node-shape">
-      <defs>
-        <linearGradient id="plate-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#94a3b8" />
-          <stop offset="100%" stopColor="#475569" />
-        </linearGradient>
-      </defs>
       {/* leads */}
-      <line x1={-w / 2} y1={0} x2={-14} y2={0} className="node-lead" />
-      <line x1={14} y1={0} x2={w / 2} y2={0} className="node-lead" />
+      <line x1={-w / 2} y1={0} x2={-16} y2={0} className="node-lead" />
+      <line x1={16} y1={0} x2={w / 2} y2={0} className="node-lead" />
       <g transform={`scale(${sx},1)`}>
-        {/* long thin plate (+) */}
-        <line x1={-14} y1={-16} x2={-14} y2={16} stroke="url(#plate-grad)" strokeWidth={3} strokeLinecap="round" />
-        {/* short thick plate (−) */}
-        <line x1={-4} y1={-9} x2={-4} y2={9} stroke="url(#plate-grad)" strokeWidth={7} strokeLinecap="round" />
-        {/* second cell */}
-        <line x1={6} y1={-16} x2={6} y2={16} stroke="url(#plate-grad)" strokeWidth={3} strokeLinecap="round" />
-        <line x1={16} y1={-9} x2={16} y2={9} stroke="url(#plate-grad)" strokeWidth={7} strokeLinecap="round" />
+        {/* cell 1: long thin (+) */}
+        <line x1={-14} y1={-16} x2={-14} y2={16} stroke="#475569" strokeWidth={3} strokeLinecap="round" />
+        {/* cell 1: short thick (−) */}
+        <line x1={-6} y1={-9} x2={-6} y2={9} stroke="#475569" strokeWidth={7} strokeLinecap="round" />
+        {/* cell 2: long thin (+) */}
+        <line x1={4} y1={-16} x2={4} y2={16} stroke="#475569" strokeWidth={3} strokeLinecap="round" />
+        {/* cell 2: short thick (−) */}
+        <line x1={12} y1={-9} x2={12} y2={9} stroke="#475569" strokeWidth={7} strokeLinecap="round" />
       </g>
-      {/* polarity signs — always readable */}
+      {/* polarity signs — always readable, outside scaled group */}
       <text x={plusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
       <text x={minusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
       <text x={0} y={h / 2 + 14} textAnchor="middle" className="node-caption">Nguồn</text>
@@ -60,13 +55,6 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
   const bodyH = 20;
   return (
     <g className="node-shape">
-      <defs>
-        <linearGradient id="resist-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e2e8f0" />
-          <stop offset="50%" stopColor="#cbd5e1" />
-          <stop offset="100%" stopColor="#94a3b8" />
-        </linearGradient>
-      </defs>
       <g transform={`scale(${sx},1)`}>
         {/* leads */}
         <line x1={-w / 2} y1={0} x2={-bodyW / 2} y2={0} className="node-lead" />
