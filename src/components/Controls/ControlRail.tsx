@@ -1,13 +1,9 @@
-import {
-  isTrialRecorded,
-  type TrialLan,
-} from '../../config/experimentConfig.ts';
 import type { ValidationResult } from '../../lib/circuitModel.ts';
 import type { CircuitApi } from '../../state/useCircuit.ts';
 import type { MeasurementApi } from '../../state/useMeasurement.ts';
 import './ControlRail.css';
 
-const TRIALS: TrialLan[] = [1, 2, 3, 4, 5];
+const TRIALS: [1, 2, 3, 4, 5] = [1, 2, 3, 4, 5];
 
 type ControlRailProps = {
   circuit: CircuitApi;
@@ -23,7 +19,7 @@ export default function ControlRail({
   onSample,
 }: ControlRailProps) {
   const { isRunning } = circuit;
-  const { selectedLan, recordedRows } = measurement;
+  const { selectedLan } = measurement;
 
   const hasInstrument = circuit.components.some(
     (c) => c.type === 'ammeter' || c.type === 'voltmeter',
@@ -92,22 +88,19 @@ export default function ControlRail({
           Lần đo
         </h2>
         <div className="rail-trial-display">
-          <span className="trial-count">{recordedRows.length} / {TRIALS.length}</span>
           <div className="trial-dots" role="group" aria-label="Chọn lần đo">
             {TRIALS.map((n) => {
-              const recorded = isTrialRecorded(recordedRows, n);
               const isActive = selectedLan === n;
               return (
                 <button
                   key={n}
                   type="button"
                   aria-pressed={isActive}
-                  disabled={recorded}
-                  className={`trial-dot${recorded ? ' trial-dot--done' : ''}${isActive ? ' trial-dot--active' : ''}`}
-                  title={recorded ? `Lần ${n} đã ghi` : `Lần ${n}`}
+                  className={`trial-dot${isActive ? ' trial-dot--active' : ''}`}
+                  title={`Lần ${n}`}
                   onClick={() => measurement.selectLan(isActive ? null : n)}
                 >
-                  {recorded ? '✓' : n}
+                  {n}
                 </button>
               );
             })}

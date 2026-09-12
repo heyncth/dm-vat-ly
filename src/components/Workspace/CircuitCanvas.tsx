@@ -363,10 +363,10 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
             </pattern>
           </defs>
           <rect x={0} y={0} width={STAGE_W} height={STAGE_H} className="stage-bg" onClick={handleBackgroundClick} />
-          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} fill="url(#lab-grid)" onClick={handleBackgroundClick} />
 
           {/* Zoomable/pannable content group */}
           <g transform={transform} className="stage-content">
+            <rect x={0} y={0} width={STAGE_W} height={STAGE_H} fill="url(#lab-grid)" onClick={handleBackgroundClick} />
             <WireLayer
               wires={wires}
               components={components}
@@ -397,6 +397,11 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
               </text>
             )}
           </g>
+
+          {/* Fixed title — does not pan/zoom */}
+          <text x={STAGE_W / 2} y={30} textAnchor="middle" className="stage-title">
+            Khu vực mô phỏng
+          </text>
         </svg>
 
         {activeTool === 'wire' && (

@@ -49,7 +49,7 @@ export default function ExperimentShell({
     }
   }, [measurement.selectedLan]);
 
-  // When simulation stops, auto-record the readout for the current trial and reset switch.
+  // When simulation stops, capture readout and reset switch.
   const wasRunning = useRef(false);
   useEffect(() => {
     if (wasRunning.current && !circuit.isRunning) {
@@ -57,10 +57,6 @@ export default function ExperimentShell({
       const u = measurement.manualU;
       const i = measurement.manualI;
       measurement.setReadout({ U: u, I: i });
-      // Auto-record if a trial is selected and valid
-      if (validation.valid && measurement.selectedLan) {
-        measurement.recordCurrent({ U: u, I: i });
-      }
       // Reset switch visual
       circuit.setSwitchOn(false);
     }

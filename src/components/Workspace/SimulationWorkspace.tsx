@@ -12,10 +12,7 @@ type Props = {
 
 export default function SimulationWorkspace({ circuit, liveReading, manualU, manualI, onInstrumentEdit }: Props) {
   return (
-    <section className="workspace" aria-labelledby="workspace-heading" data-testid="simulation-workspace">
-      <h2 id="workspace-heading" className="section-heading">
-        Khu vực mô phỏng
-      </h2>
+    <section className="workspace" data-testid="simulation-workspace">
       <div className="workspace-stage">
         <CircuitCanvas
           circuit={circuit}

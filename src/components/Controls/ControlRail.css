@@ -107,33 +107,26 @@
   gap: var(--space-2);
 }
 
-.trial-count {
-  font-size: var(--text-body);
-  font-weight: 700;
-  color: var(--color-text);
-  font-variant-numeric: tabular-nums;
-}
-
 .trial-dots {
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .trial-dot {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   font: inherit;
   font-size: var(--text-helper);
   font-weight: 600;
-  color: var(--color-text);
-  background: var(--color-page);
-  border: 2px solid var(--color-border);
-  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
 .trial-dot:hover:not(:disabled) {
@@ -143,15 +136,15 @@
 
 .trial-dot--active {
   border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 10%, white);
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
 }
 
 .trial-dot--done {
-  background: var(--color-success);
-  border-color: var(--color-success);
-  color: white;
-  cursor: default;
+  background: var(--color-panel);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
 }
 
 /* ---- readout ---- */
