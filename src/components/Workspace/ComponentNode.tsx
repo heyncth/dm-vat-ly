@@ -68,7 +68,7 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
         <rect x={-bodyW / 2 + 24} y={-bodyH / 2} width={4} height={bodyH} fill="#b45309" rx={1} />
         <rect x={bodyW / 2 - 10} y={-bodyH / 2} width={4} height={bodyH} fill="#d4af37" rx={1} />
       </g>
-      <text x={0} y={h / 2 + 12} textAnchor="middle" className="node-caption">R</text>
+      <text x={0} y={h / 2 + 12} textAnchor="middle" className="node-caption">Điện trở</text>
       {rValue !== null && (
         <g className="r-badge">
           <rect x={-38} y={-bodyH / 2 - 26} width={76} height={20} rx={4} fill="#fef08a" stroke="#eab308" strokeWidth={1.5} />
