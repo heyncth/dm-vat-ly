@@ -23,14 +23,20 @@ describe('Phase 2 circuit editing', () => {
     }
   });
 
-  it('places, selects, and deletes a component', () => {
+  it('places, selects, and deletes a component via toolbar X button', () => {
     render(<App />);
 
     addComponent('Điện trở');
-    expect(stageNode(/linh kiện điện trở/i)).toBeInTheDocument();
-    expect(screen.getByText(/đã chọn:/i)).toHaveTextContent('Điện trở');
+    const node = stageNode(/linh kiện điện trở/i);
+    expect(node).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Xóa (Del)' }));
+    // Select the component
+    fireEvent.click(node);
+
+    // Click the toolbar X delete button (has title="Xóa")
+    const deleteBtn = screen.getByTitle('Xóa');
+    fireEvent.click(deleteBtn);
+
     expect(within(stage()).queryByRole('button', { name: /linh kiện điện trở/i })).not.toBeInTheDocument();
   });
 

@@ -9,6 +9,7 @@ import {
   type WireEndpoint,
 } from '../../lib/circuitModel.ts';
 import type { CircuitApi } from '../../state/useCircuit.ts';
+import type { PlacedComponent } from '../../lib/circuitModel.ts';
 import ComponentNode from './ComponentNode.tsx';
 import ComponentPalette from './ComponentPalette.tsx';
 import WireLayer from './WireLayer.tsx';
@@ -19,6 +20,74 @@ const MIN_ZOOM = 0.3;
 const MAX_ZOOM = 3;
 
 type Ghost = { type: ComponentType; clientX: number; clientY: number };
+
+function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentEdit }: {
+  comp: PlacedComponent;
+  circuit: CircuitApi;
+  liveReading?: { U: number; I: number } | null;
+  manualU?: number;
+  manualI?: number;
+  onInstrumentEdit?: (type: 'U' | 'I', value: number) => void;
+}) {
+  const def = COMPONENT_DEFS[comp.type];
+  const isInstrument = comp.type === 'voltmeter' || comp.type === 'ammeter';
+  const unit = comp.type === 'voltmeter' ? 'V' : 'A';
+  const value = comp.type === 'voltmeter' ? manualU : manualI;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const commitEdit = () => {
+    setEditing(false);
+    const num = parseFloat(draft);
+    if (!isNaN(num) && num >= 0 && onInstrumentEdit) {
+      onInstrumentEdit(comp.type === 'voltmeter' ? 'U' : 'I', num);
+    }
+  };
+
+  return (
+    <>
+      {/* Top toolbar — actions */}
+      <div className="toolbar-wrap">
+        <div className="toolbar">
+          <button type="button" className="toolbar-btn" title="Lật ngược" onClick={() => circuit.flipComponent(comp.id)}>
+            ⇄
+          </button>
+          {isInstrument && !circuit.isRunning && (
+            <span className="toolbar-value" onClick={() => { setDraft(String(value ?? 0)); setEditing(true); }}>
+              {(value ?? 0).toFixed(2)} {unit} ✎
+            </span>
+          )}
+          {isInstrument && circuit.isRunning && (
+            <span className="toolbar-value toolbar-value--live">
+              {(comp.type === 'voltmeter' ? liveReading?.U : liveReading?.I)?.toFixed(2) ?? '0.00'} {unit}
+            </span>
+          )}
+          <button type="button" className="toolbar-btn toolbar-btn--delete" title="Xóa" onClick={() => {
+            circuit.setSelected({ kind: 'comp', id: comp.id });
+            circuit.removeSelected();
+          }}>×</button>
+        </div>
+        {editing && isInstrument && (
+          <div className="toolbar-edit">
+            <input type="number" min={0} step="any" value={draft} autoFocus
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitEdit}
+              onKeyDown={(e) => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditing(false); }}
+            />
+            <span className="toolbar-edit-unit">{unit}</span>
+            <button type="button" className="toolbar-edit-ok" onClick={commitEdit}>✓</button>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom bar — info only */}
+      <div className="info-bar-wrap">
+        <div className="info-bar">
+          Đã chọn: {def.label}
+        </div>
+      </div>
+    </>
+  );
+}
 
 type CircuitCanvasProps = {
   circuit: CircuitApi;
@@ -84,7 +153,9 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
 
       const oldZoom = zoomRef.current;
       const oldPan = panRef.current;
-      const factor = e.deltaY > 0 ? 0.9 : 1.1;
+      // Smooth zoom: smaller increments, scaled by deltaY magnitude
+      const rawFactor = -e.deltaY * 0.005;
+      const factor = 1 + Math.max(-0.15, Math.min(0.15, rawFactor));
       const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZoom * factor));
       const ratio = newZoom / oldZoom;
       const newPan = {
@@ -100,6 +171,14 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
     return () => svg.removeEventListener('wheel', handler);
   }, []);
 
+  const handleBackgroundClick = useCallback(() => {
+    if (circuit.activeTool === 'wire') {
+      circuit.cancelPending();
+      circuit.setActiveTool('select');
+    }
+    circuit.setSelected(null);
+  }, [circuit]);
+
   // ---- middle-click / alt+drag pan ----
   const handleSvgPointerDown = useCallback((e: React.PointerEvent) => {
     // Pan on middle button or when clicking empty background
@@ -108,33 +187,37 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
       || (e.target as Element).classList.contains('stage-bg')
       || (e.target as Element).getAttribute('fill') === 'url(#lab-grid)';
 
-    if (isMiddle || (isBackground && e.button === 0 && activeTool === 'select' && !pending)) {
-      e.preventDefault();
-      isPanning.current = true;
-      panDrag.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
-      svgRef.current?.setPointerCapture(e.pointerId);
+    if (isBackground) {
+      // Always deselect + cancel wire on background click
+      handleBackgroundClick();
 
-      const onMove = (ev: PointerEvent) => {
-        const drag = panDrag.current;
-        if (!drag) return;
-        const dx = (ev.clientX - drag.startX) * (STAGE_W / (svgRef.current?.getBoundingClientRect().width ?? 1));
-        const dy = (ev.clientY - drag.startY) * (STAGE_H / (svgRef.current?.getBoundingClientRect().height ?? 1));
-        setPan({ x: drag.panX + dx, y: drag.panY + dy });
-      };
-      const onUp = () => {
-        isPanning.current = false;
-        panDrag.current = null;
-        window.removeEventListener('pointermove', onMove);
-        window.removeEventListener('pointerup', onUp);
-      };
-      window.addEventListener('pointermove', onMove);
-      window.addEventListener('pointerup', onUp, { once: true });
+      if (isMiddle || (e.button === 0 && activeTool === 'select' && !pending)) {
+        e.preventDefault();
+        isPanning.current = true;
+        panDrag.current = { startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
+        svgRef.current?.setPointerCapture(e.pointerId);
+
+        const onMove = (ev: PointerEvent) => {
+          const drag = panDrag.current;
+          if (!drag) return;
+          const dx = (ev.clientX - drag.startX) * (STAGE_W / (svgRef.current?.getBoundingClientRect().width ?? 1));
+          const dy = (ev.clientY - drag.startY) * (STAGE_H / (svgRef.current?.getBoundingClientRect().height ?? 1));
+          setPan({ x: drag.panX + dx, y: drag.panY + dy });
+        };
+        const onUp = () => {
+          isPanning.current = false;
+          panDrag.current = null;
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+        };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp, { once: true });
+      }
     }
-  }, [activeTool, pending, pan.x, pan.y]);
+  }, [activeTool, pending, pan.x, pan.y, handleBackgroundClick]);
 
   // ---- node dragging ----
   const handleNodePointerDown = (event: React.PointerEvent, id: string) => {
-    if (circuit.activeTool === 'wire') return;
     if (event.button !== 0 && event.pointerType === 'mouse') return;
     const comp = components.find((c) => c.id === id);
     const pt = svgPoint(event.clientX, event.clientY);
@@ -214,39 +297,22 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
     else if (event.key === 'ArrowRight') dx = step;
     else if (event.key === 'ArrowUp') dy = -step;
     else if (event.key === 'ArrowDown') dy = step;
-    else if (event.key === 'Delete' || event.key === 'Backspace') {
-      event.preventDefault();
-      circuit.setSelected({ kind: 'comp', id });
-      circuit.removeSelected();
-      return;
-    } else return;
+    else return;
     event.preventDefault();
     circuit.dropComponent(id, comp.x + dx, comp.y + dy);
   };
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const inField = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
       if (event.key === 'Escape') {
         if (circuit.pending) circuit.cancelPending();
         else if (circuit.activeTool === 'wire') circuit.setActiveTool('select');
         else circuit.setSelected(null);
-        return;
-      }
-      if ((event.key === 'Delete' || event.key === 'Backspace') && !inField) {
-        if (circuit.selected?.kind === 'wire') {
-          event.preventDefault();
-          circuit.removeSelected();
-        }
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [selected, activeTool, pending]);
-
-  const selectedComp = selected?.kind === 'comp' ? components.find((c) => c.id === selected.id) ?? null : null;
-  const selectedWireIndex = selected?.kind === 'wire' ? wires.findIndex((w) => w.id === selected.id) : -1;
 
   const handleTerminalActivate = (endpoint: WireEndpoint) => {
     if (activeTool !== 'wire') circuit.setActiveTool('wire');
@@ -296,8 +362,8 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
               <circle cx={GRID / 2} cy={GRID / 2} r={1.2} fill="var(--color-border)" opacity="0.45" />
             </pattern>
           </defs>
-          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} className="stage-bg" />
-          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} fill="url(#lab-grid)" />
+          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} className="stage-bg" onClick={handleBackgroundClick} />
+          <rect x={0} y={0} width={STAGE_W} height={STAGE_H} fill="url(#lab-grid)" onClick={handleBackgroundClick} />
 
           {/* Zoomable/pannable content group */}
           <g transform={transform} className="stage-content">
@@ -321,13 +387,8 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
                 isRunning={circuit.isRunning}
                 liveReading={circuit.isRunning ? liveReading : null}
                 instrumentValue={comp.type === 'voltmeter' ? manualU : comp.type === 'ammeter' ? manualI : undefined}
-                onInstrumentEdit={onInstrumentEdit ? (id, value) => {
-                  const c = components.find((c) => c.id === id);
-                  if (c) onInstrumentEdit(c.type === 'voltmeter' ? 'U' : 'I', value);
-                } : undefined}
                 onNodeKeyDown={handleNodeKeyDown}
                 onTerminalActivate={handleTerminalActivate}
-                onSwitchToggle={() => circuit.setSwitchOn(!circuit.switchOn)}
               />
             ))}
             {components.length === 0 && (
@@ -342,23 +403,24 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
           <p className="stage-chip" role="status">
             {pending
               ? 'Đã chọn 1 chốt — chọn chốt thứ 2 để nối (Esc hủy)'
-              : 'Chế độ nối dây — chọn 2 chốt để nối (Esc thoát)'}
+              : 'Chế độ nối dây — chọn 2 chốt để nối (nhấn ngoài để thoát)'}
           </p>
         )}
 
-        {(selectedComp || selectedWireIndex >= 0) && (
-          <div className="selection-bar">
-            <span>
-              Đã chọn:{' '}
-              {selectedComp
-                ? COMPONENT_DEFS[selectedComp.type].label
-                : `Dây nối ${selectedWireIndex + 1}`}
-            </span>
-            <button type="button" onClick={circuit.removeSelected}>
-              Xóa (Del)
-            </button>
-          </div>
-        )}
+        {selected?.kind === 'comp' && (() => {
+          const comp = components.find((c) => c.id === selected.id);
+          if (!comp) return null;
+          return (
+            <SelectionBar
+              comp={comp}
+              circuit={circuit}
+              liveReading={liveReading}
+              manualU={manualU}
+              manualI={manualI}
+              onInstrumentEdit={onInstrumentEdit}
+            />
+          );
+        })()}
       </div>
 
       {ghost && (

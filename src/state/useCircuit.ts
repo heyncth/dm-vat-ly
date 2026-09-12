@@ -33,6 +33,7 @@ export interface CircuitApi {
   addComponent: (type: ComponentType, at?: Point) => void;
   moveComponent: (id: string, x: number, y: number) => void;
   dropComponent: (id: string, x: number, y: number) => void;
+  flipComponent: (id: string) => void;
   setSelected: (selection: Selection) => void;
   removeSelected: () => void;
   setActiveTool: (tool: ActiveTool) => void;
@@ -80,6 +81,12 @@ export function useCircuit(): CircuitApi {
       prev.map((c) => (c.id === id ? { ...c, ...clampPosition(c.type, x, y) } : c)),
     );
     setMode('manual');
+  };
+
+  const flipComponent = (id: string) => {
+    setComponents((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, flipped: !c.flipped } : c)),
+    );
   };
 
   const removeSelected = () => {
@@ -181,6 +188,7 @@ export function useCircuit(): CircuitApi {
     addComponent,
     moveComponent,
     dropComponent,
+    flipComponent,
     setSelected,
     removeSelected,
     setActiveTool,

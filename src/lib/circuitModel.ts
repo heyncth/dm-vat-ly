@@ -18,6 +18,8 @@ export interface PlacedComponent {
   /** Center position in SVG stage units. */
   x: number;
   y: number;
+  /** Horizontal flip — swaps terminal 'a' and 'b' positions. */
+  flipped?: boolean;
 }
 
 export interface WireEndpoint {

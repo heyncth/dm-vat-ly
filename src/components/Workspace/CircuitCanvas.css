@@ -5,6 +5,8 @@
   min-height: 0;
   display: flex;
   gap: var(--space-3);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ---- palette: vertical kit strip docked to the stage edge ---- */
@@ -127,6 +129,8 @@
   border-radius: var(--radius-lg);
   touch-action: none;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .stage-svg--panning {
@@ -371,14 +375,20 @@
   box-shadow: var(--shadow-raise);
 }
 
-.selection-bar {
+/* ---- top toolbar (actions) ---- */
+.toolbar-wrap {
   position: absolute;
-  left: var(--space-2);
-  bottom: var(--space-2);
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.toolbar {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  padding: var(--space-1) var(--space-2);
   font-size: var(--text-helper);
   font-weight: 600;
   background: var(--color-panel);
@@ -387,15 +397,132 @@
   box-shadow: var(--shadow-raise);
 }
 
-.selection-bar button {
-  min-height: 36px;
-  padding: 0 var(--space-3);
+.toolbar-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   font: inherit;
-  color: var(--color-primary-contrast);
-  background: var(--color-primary);
-  border: 0;
-  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+}
+
+.toolbar-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.toolbar-btn--delete {
+  color: #fff;
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+.toolbar-btn--delete:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.toolbar-value {
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+}
+
+.toolbar-value:hover {
+  background: var(--color-bg);
+}
+
+.toolbar-value--live {
+  color: #166534;
+  cursor: default;
+}
+
+.toolbar-value--live:hover {
+  background: transparent;
+}
+
+.toolbar-edit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  margin-top: var(--space-1);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-raise);
+}
+
+.toolbar-edit input {
+  width: 64px;
+  height: 28px;
+  padding: 0 var(--space-1);
+  font: inherit;
+  font-size: 13px;
+  font-family: monospace;
+  text-align: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.toolbar-edit input:focus {
+  border-color: var(--color-primary);
+}
+
+.toolbar-edit-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.toolbar-edit-ok {
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #16a34a;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.toolbar-edit-ok:hover {
+  background: #15803d;
+}
+
+/* ---- bottom info bar ---- */
+.info-bar-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-3);
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.info-bar {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-helper);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-raise);
+  white-space: nowrap;
 }
 
 .drag-ghost {
