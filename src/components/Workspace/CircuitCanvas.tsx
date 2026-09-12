@@ -21,13 +21,14 @@ const MAX_ZOOM = 3;
 
 type Ghost = { type: ComponentType; clientX: number; clientY: number };
 
-function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentEdit }: {
+function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentEdit, screenPos }: {
   comp: PlacedComponent;
   circuit: CircuitApi;
   liveReading?: { U: number; I: number } | null;
   manualU?: number;
   manualI?: number;
   onInstrumentEdit?: (type: 'U' | 'I', value: number) => void;
+  screenPos: { x: number; y: number; halfW: number; halfH: number } | null;
 }) {
   const def = COMPONENT_DEFS[comp.type];
   const isInstrument = comp.type === 'voltmeter' || comp.type === 'ammeter';
@@ -43,10 +44,12 @@ function SelectionBar({ comp, circuit, liveReading, manualU, manualI, onInstrume
     }
   };
 
+  const toolbarStyle = screenPos ? { left: screenPos.x + screenPos.halfW + 12, top: screenPos.y - 18 } : {};
+
   return (
     <>
-      {/* Top toolbar — actions */}
-      <div className="toolbar-wrap">
+      {/* Toolbar — actions, positioned next to selected component */}
+      <div className="toolbar-wrap" style={toolbarStyle}>
         <div className="toolbar">
           <button type="button" className="toolbar-btn" title="Lật ngược" onClick={() => circuit.flipComponent(comp.id)}>
             ⇄
@@ -415,6 +418,19 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
         {selected?.kind === 'comp' && (() => {
           const comp = components.find((c) => c.id === selected.id);
           if (!comp) return null;
+          const svg = svgRef.current;
+          if (!svg) return null;
+          const rect = svg.getBoundingClientRect();
+          const def = COMPONENT_DEFS[comp.type];
+          const pixelPerUnit = rect.width / STAGE_W;
+          const svgX = (comp.x * zoom + pan.x) * pixelPerUnit + rect.left;
+          const svgY = (comp.y * zoom + pan.y) * pixelPerUnit + rect.top;
+          const screenPos = {
+            x: svgX,
+            y: svgY,
+            halfW: (def.w / 2) * zoom * pixelPerUnit,
+            halfH: (def.h / 2) * zoom * pixelPerUnit,
+          };
           return (
             <SelectionBar
               comp={comp}
@@ -423,6 +439,7 @@ export default function CircuitCanvas({ circuit, liveReading, manualU, manualI, 
               manualU={manualU}
               manualI={manualI}
               onInstrumentEdit={onInstrumentEdit}
+              screenPos={screenPos}
             />
           );
         })()}

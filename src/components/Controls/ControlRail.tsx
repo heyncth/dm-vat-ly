@@ -24,15 +24,23 @@ export default function ControlRail({
   const hasInstrument = circuit.components.some(
     (c) => c.type === 'ammeter' || c.type === 'voltmeter',
   );
-  const hasSwitchPart = circuit.components.some((c) => c.type === 'switch');
-  const canRun = validation.valid && hasSwitchPart && hasInstrument;
+  const hasSupply = circuit.components.some((c) => c.type === 'supply');
+  const hasSwitch = circuit.components.some((c) => c.type === 'switch');
+  const switchWired = circuit.wires.some((w) => {
+    const from = circuit.components.find((c) => c.id === w.from.compId);
+    const to = circuit.components.find((c) => c.id === w.to.compId);
+    return from?.type === 'switch' || to?.type === 'switch';
+  });
+  const canRun = hasSupply && hasInstrument && hasSwitch && switchWired;
 
   let runReason: string | null = null;
   if (!canRun) {
-    if (!validation.valid) {
-      runReason = 'Mạch chưa đầy đủ — thêm linh kiện và nối dây.';
-    } else if (!hasSwitchPart) {
+    if (!hasSupply) {
+      runReason = 'Thêm nguồn điện vào mạch.';
+    } else if (!hasSwitch) {
       runReason = 'Thêm công tắc vào mạch.';
+    } else if (!switchWired) {
+      runReason = 'Nối dây vào công tắc.';
     } else if (!hasInstrument) {
       runReason = 'Thêm Vôn kế hoặc Ampe kế.';
     }
@@ -45,7 +53,7 @@ export default function ControlRail({
           Mạch
         </h2>
         <p className="rail-status" role="status">
-          {validation.valid ? '✓ Mạch hợp lệ' : 'Chưa sẵn sàng'}
+          {validation.valid ? '✓ Mạch hợp lệ' : canRun ? '✓ Sẵn sàng đo' : 'Chưa sẵn sàng'}
         </p>
         <button type="button" className="secondary-btn" onClick={onSample}>
           Mạch mẫu
