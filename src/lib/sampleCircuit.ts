@@ -24,9 +24,9 @@ export function createSampleCircuit(): SampleCircuit {
   const components: PlacedComponent[] = [
     { id: 'sample-supply', type: 'supply', x: 200, y: 380, flipped: true },
     { id: 'sample-switch', type: 'switch', x: 600, y: 380 },
-    { id: 'sample-ammeter', type: 'ammeter', x: 600, y: 150 },
+    { id: 'sample-ammeter', type: 'ammeter', x: 600, y: 150, flipped: true },
     { id: 'sample-resistor', type: 'resistor', x: 200, y: 150 },
-    { id: 'sample-voltmeter', type: 'voltmeter', x: 200, y: 260 },
+    { id: 'sample-voltmeter', type: 'voltmeter', x: 200, y: 260, flipped: true },
   ];
 
   const wire = (id: string, from: WireEndpoint, to: WireEndpoint): Wire => ({

@@ -49,8 +49,6 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
   const sx = flipped ? -1 : 1;
   const bodyW = 48;
   const bodyH = 20;
-  const plusX = flipped ? w / 2 + 6 : -w / 2 - 6;
-  const minusX = flipped ? -w / 2 - 6 : w / 2 + 6;
   return (
     <g className="node-shape">
       <g transform={`scale(${sx},1)`}>
@@ -66,9 +64,6 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
         <rect x={-bodyW / 2 + 24} y={-bodyH / 2} width={4} height={bodyH} fill="#b45309" rx={1} />
         <rect x={bodyW / 2 - 10} y={-bodyH / 2} width={4} height={bodyH} fill="#d4af37" rx={1} />
       </g>
-      {/* polarity signs */}
-      <text x={plusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
-      <text x={minusX} y={-h / 2 - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
       <text x={0} y={h / 2 + 12} textAnchor="middle" className="node-caption">Điện trở</text>
       {rValue !== null && (
         <g className="r-badge">
@@ -82,12 +77,13 @@ function ResistorShape({ w, h, isRunning, liveReading, flipped }: { w: number; h
   );
 }
 
-function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue }: {
+function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue, flipped }: {
   comp: PlacedComponent;
   w: number;
   isRunning?: boolean;
   liveReading?: { U: number; I: number } | null;
   instrumentValue?: number;
+  flipped?: boolean;
 }) {
   const r = w / 2 - 4;
   const unit = comp.type === 'ammeter' ? 'A' : 'V';
@@ -119,8 +115,8 @@ function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue }: {
         {displayValue.toFixed(2)} {unit}
       </text>
       {/* polarity signs */}
-      <text x={-w / 2 - 6} y={-r - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
-      <text x={w / 2 + 6} y={-r - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
+      <text x={flipped ? w / 2 + 6 : -w / 2 - 6} y={-r - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>
+      <text x={flipped ? -w / 2 - 6 : w / 2 + 6} y={-r - 2} textAnchor="middle" className="node-sign node-sign--minus">−</text>
       <text y={r + 14} textAnchor="middle" className="node-caption">
         {comp.type === 'ammeter' ? 'Ampe kế' : 'Vôn kế'}
       </text>
@@ -185,7 +181,7 @@ export default function ComponentNode({
       {comp.type === 'resistor' && <ResistorShape w={def.w} h={def.h} isRunning={isRunning} liveReading={liveReading} flipped={comp.flipped} />}
       {(comp.type === 'ammeter' || comp.type === 'voltmeter') && (
         <InstrumentShape comp={comp} w={def.w} isRunning={isRunning} liveReading={liveReading}
-          instrumentValue={instrumentValue} />
+          instrumentValue={instrumentValue} flipped={comp.flipped} />
       )}
       {comp.type === 'switch' && (
         <SwitchShape w={def.w} h={def.h} closed={switchClosed === true} flipped={comp.flipped} />
