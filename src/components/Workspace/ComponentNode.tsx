@@ -112,7 +112,7 @@ function InstrumentShape({ comp, w, isRunning, liveReading, instrumentValue, fli
         fontSize: '12px', fontWeight: 700, fontFamily: 'monospace',
         fill: isRunning ? '#166534' : '#475569', userSelect: 'none',
       }}>
-        {displayValue.toFixed(2)} {unit}
+        {displayValue.toFixed(comp.type === 'ammeter' ? 3 : 2)} {unit}
       </text>
       {/* polarity signs */}
       <text x={flipped ? w / 2 + 6 : -w / 2 - 6} y={-r - 2} textAnchor="middle" className="node-sign node-sign--plus">+</text>

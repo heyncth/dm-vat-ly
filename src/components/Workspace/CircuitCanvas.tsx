@@ -83,7 +83,7 @@ function BottomBar({ comp, circuit, liveReading, manualU, manualI, onInstrumentE
         )}
         {isInstrument && circuit.isRunning && (
           <span className="bottom-bar-value bottom-bar-value--live">
-            {(comp.type === 'voltmeter' ? liveReading?.U : liveReading?.I)?.toFixed(2) ?? '0.00'} {unit}
+            {(comp.type === 'voltmeter' ? liveReading?.U : liveReading?.I)?.toFixed(comp.type === 'voltmeter' ? 2 : 3) ?? (comp.type === 'voltmeter' ? '0.00' : '0.000')} {unit}
           </span>
         )}
       </div>
